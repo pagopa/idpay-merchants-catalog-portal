@@ -1,0 +1,50 @@
+name: 'coverage'
+
+on:
+  push:
+    branches:
+      - main
+      - uat
+      - develop
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: |
+          corepack enable
+          yarn install --immutable --check-cache || yarn install --force 
+
+      - name: Test and coverage
+        run: yarn test:coverage
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v5.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=${{ vars.SONARCLOUD_ORG }}
+            -Dsonar.projectKey=${{ vars.SONARCLOUD_PROJECT_KEY }}
+            -Dsonar.projectName="${{ vars.SONARCLOUD_PROJECT_NAME }}"
+            -Dsonar.javascript.lcov.reportPaths='./coverage/lcov.info'
+            -Dsonar.exclusions=**/src/assets/**,**/setup.ts,**/*.test.ts,**/*.test.tsx
+            -Dsonar.typescript.tsconfigPath=tsconfig.json
