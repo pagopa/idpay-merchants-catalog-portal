@@ -1,3 +1,4 @@
+import { appConfig } from '../../config/app';
 import { FooterPostLogin, FooterLegal } from '@pagopa/mui-italia';
 import { IOFeaturesBanner } from '../IOFeaturesBanner/IOFeaturesBanner';
 import { BonusPariInfo } from '../BonusPARIInfo/BonusPARIInfo';
@@ -5,9 +6,9 @@ import { IOBanner } from '../IOBanner/IOBanner';
 
 const FOOTER_LINKS = {
     COMPANY: 'https://www.pagopa.it/it/',
-    PRIVACY: 'https://bonuselettrodomestici.it/utente/privacy-policy',
+    PRIVACY: appConfig.usersPortalLinks.privacy,
     PERSONAL_DATA: 'https://privacyportal-de.onetrust.com/webform/77f17844-04c3-4969-a11d-462ee77acbe1/9ab6533d-be4a-482e-929a-0d8d2ab29df8',
-    TERMS_AND_CONDITIONS: 'https://bonuselettrodomestici.it/utente/terms-of-service',
+    TERMS_AND_CONDITIONS: appConfig.usersPortalLinks.terms,
     A11Y: 'https://form.agid.gov.it/view/9b5c6ed0-bbbb-11f0-a7e5-9bac06d781c9'
 } as const;
 

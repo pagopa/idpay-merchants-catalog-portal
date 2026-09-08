@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, IconButton, Typography, MenuItem, Select } from '@mui/material';
+import { Box, IconButton, Typography, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
 interface CustomPaginationActionsProps {
@@ -59,7 +59,7 @@ function CustomPaginationActions({
 }
 
 interface CustomPaginatorProps {
-  sortedData: any[];
+  sortedData: readonly unknown[];
   page: number;
   setPage: (page: number) => void;
   ROWS_PER_PAGE: number;
@@ -75,8 +75,8 @@ export default function CustomPaginator({
   ROWS_PER_PAGE,
   setRowsPerPage,
 }: CustomPaginatorProps) {
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+  const handleChangeRowsPerPage = (event: SelectChangeEvent<number>) => {
+    setRowsPerPage(Number(event.target.value));
     setPage(1);
   };
 
@@ -110,7 +110,7 @@ export default function CustomPaginator({
           </Typography>
           <Select
             value={ROWS_PER_PAGE}
-            onChange={(e) => handleChangeRowsPerPage(e as any)}
+            onChange={handleChangeRowsPerPage}
             variant="standard"
             disableUnderline
             sx={{

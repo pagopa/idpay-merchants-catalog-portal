@@ -1,7 +1,9 @@
 import { Card, CardContent, Typography, Box } from '@mui/material'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { ButtonNaked, theme } from '@pagopa/mui-italia'
-import type { Store, PhysicalStore, OnlineStore } from './StoreList'
+import type { Store } from './StoreList'
+import { getStoreField } from './storeFields'
+import { appConfig } from '../../config/app'
 
 interface MobileStoreCardProps {
   store: Store
@@ -10,16 +12,7 @@ interface MobileStoreCardProps {
 }
 
 const MobileStoreCard = ({ store, isOnline, onClick }: MobileStoreCardProps) => {
-  const getAddressString = (s: PhysicalStore) => {
-    const parts = [
-      s.address,
-      s.streetNumber,
-      s.zipCode,
-      s.city,
-      s.province,
-    ].filter(Boolean)
-    return parts.join(', ')
-  }
+  const columns = isOnline ? appConfig.tableColumns.online : appConfig.tableColumns.physical;
 
   return (
     <Card
@@ -34,48 +27,14 @@ const MobileStoreCard = ({ store, isOnline, onClick }: MobileStoreCardProps) => 
       }}
     >
       <CardContent sx={{ px: 2.5, pt: 2, pb: 0, '&:last-child': { pb: 1 }, }}>
-        <Typography
-          variant="subtitle2"
-          sx={{
-            fontWeight: 700,
-            color: theme.palette.text.primary,
-            mb: 0.3,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            width: '100%',
-          }}
-        >
-          {store.franchiseName}
-        </Typography>
-
-        {!isOnline ? (
-          <Typography
-            variant="body2"
-            sx={{
-              color: '#374151',
-              fontWeight: 500,
-              mb: 0.8,
-              lineHeight: 1.4,
-            }}
-          >
-            {getAddressString(store as PhysicalStore)}
+        {columns.filter(col => col.key !== 'actions').map((col, index) => (
+          <Typography key={col.key} variant={index === 0 ? 'subtitle2' : 'body2'}
+            sx={{ fontWeight: index === 0 ? 700 : 500, color: theme.palette.text.primary, mb: 0.8, overflowWrap: 'anywhere' }}>
+            {getStoreField(store, col.key) || '-'}
           </Typography>
-        ) : (
-          <Typography
-            variant="body2"
-            sx={{
-              color: '#374151',
-              fontWeight: 500,
-              mb: 0.8,
-              lineHeight: 1.4,
-            }}
-          >
-            {(store as OnlineStore).website || '-'}
-          </Typography>
-        )}
+        ))}
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+        {columns.some(col => col.key === 'actions') && <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
           <ButtonNaked
             variant="text"
             endIcon={<ArrowForwardIosIcon sx={{ fontSize: 14 }} />}
@@ -93,7 +52,7 @@ const MobileStoreCard = ({ store, isOnline, onClick }: MobileStoreCardProps) => 
           >
             Mostra dettagli
           </ButtonNaked>
-        </Box>
+        </Box>}
       </CardContent>
     </Card>
   )

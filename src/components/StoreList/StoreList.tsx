@@ -1,3 +1,6 @@
+import { getStoreField } from './storeFields'
+import { appConfig } from '../../config/app'
+import type { StoreField } from '../../config/initiative'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Table,
@@ -44,33 +47,13 @@ export interface OnlineStore {
 
 export type Store = PhysicalStore | OnlineStore
 
-interface Column {
-  id: string
-  label: string
-  align: 'left' | 'center' | 'right' | 'inherit' | 'justify'
-  width: string
-}
-
-const physicalColumns: Column[] = [
-  { id: 'franchiseName', label: 'Esercente', align: 'left', width: '33%' },
-  { id: 'address', label: 'Indirizzo', align: 'left', width: '34%' },
-  { id: 'city', label: 'Città', align: 'left', width: '26%' },
-  { id: 'actions', label: '', align: 'right', width: '7%' },
-]
-
-const onlineColumns: Column[] = [
-  { id: 'franchiseName', label: 'Esercente', align: 'left', width: '40%' },
-  { id: 'website', label: 'URL', align: 'left', width: '53%' },
-  { id: 'actions', label: '', align: 'right', width: '7%' },
-]
-
 interface StoreListProps {
   data: Store[]
 }
 
 const StoreList = (json: StoreListProps) => {
   const [isOnline, setIsOnline] = useState(false);
-  const [orderBy, setOrderBy] = useState<string>('franchiseName')
+  const [orderBy, setOrderBy] = useState<StoreField>('franchiseName')
   const [order, setOrder] = useState<'asc' | 'desc'>('asc')
   const [page, setPage] = useState<number>(1)
   const [filters, setFilters] = useState<{
@@ -81,7 +64,7 @@ const StoreList = (json: StoreListProps) => {
   }>({})
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const columns = isOnline ? onlineColumns : physicalColumns
+  const columns = isOnline ? appConfig.tableColumns.online : appConfig.tableColumns.physical
 
   const sanitizeStore = <T extends Omit<Store, 'id'>>(store: T): T => {
     const sanitized = { ...store }
@@ -132,7 +115,7 @@ const StoreList = (json: StoreListProps) => {
     setDrawerOpen(true)
   }
 
-  const handleSort = (property: keyof Store) => {
+  const handleSort = (property: StoreField) => {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property)
@@ -165,8 +148,8 @@ const StoreList = (json: StoreListProps) => {
     }
 
     const sorted = [...filtered].sort((a, b) => {
-      const aValue = String(a[orderBy as keyof typeof a] ?? '')
-      const bValue = String(b[orderBy as keyof typeof b] ?? '')
+      const aValue = getStoreField(a, orderBy)
+      const bValue = getStoreField(b, orderBy)
       return order === 'asc'
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue)
@@ -392,9 +375,9 @@ const StoreList = (json: StoreListProps) => {
                   <TableRow>
                     {columns.map((col) => (
                       <TableCell
-                        key={col.id}
+                        key={col.key}
                         align={col.align}
-                        sortDirection={orderBy === col.id ? order : false}
+                        sortDirection={orderBy === col.key ? order : false}
                         sx={{
                           width: col.width,
                           fontWeight: 600,
@@ -407,11 +390,11 @@ const StoreList = (json: StoreListProps) => {
                           verticalAlign: 'bottom'
                         }}
                       >
-                        {col.id !== 'actions' ? (
+                        {col.sortable && col.key !== 'actions' ? (
                           <TableSortLabel
-                            active={orderBy === col.id}
-                            direction={orderBy === col.id ? order : 'asc'}
-                            onClick={() => handleSort(col.id as keyof Store)}
+                            active={orderBy === col.key}
+                            direction={orderBy === col.key ? order : 'asc'}
+                            onClick={() => handleSort(col.key as StoreField)}
                             sx={{
                               '& .MuiTableSortLabel-icon': {
                                 color: '#6b7280 !important',
@@ -443,96 +426,26 @@ const StoreList = (json: StoreListProps) => {
                           borderBottom: '2px solid #E3E7EB',
                         }}
                       >
-                        <TableCell align="left" sx={{ px: 3, py: 1.5 }}>
-                          <Tooltip title={row.franchiseName} arrow placement="bottom-start">
-                            <Typography
-                              variant="body2"
-                              noWrap
-                              sx={{
-                                color: '#1f2937',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                                display: 'block',
-                              }}
-                            >
-                              {row.franchiseName}
-                            </Typography>
-                          </Tooltip>
-                        </TableCell>
-
-                        {row.type === 'ONLINE' ? (
-                          <TableCell align="left" sx={{ px: 3, py: 1.5 }}>
-                            {row.website ? (
-                              <Tooltip title={row.website} arrow placement="bottom-start">
-                                <Typography
-                                  variant="body2"
-                                  noWrap
-                                  sx={{
-                                    color: '#0B3EE3',
-                                    textDecoration: 'underline',
-                                    cursor: 'pointer',
-                                  }}
-                                  onClick={() => window.open(row.website, '_blank')}
-                                >
-                                  {row.website}
-                                </Typography>
-                              </Tooltip>
-                            ) : (
-                              <Typography variant="body2" sx={{ color: '#9CA3AF' }}>
-                                -
-                              </Typography>
-                            )}
-                          </TableCell>
-                        ) : (
-                          <>
-                            <TableCell align="left" sx={{ px: 3, py: 1.5 }}>
-                              <Tooltip title={`${row.address}${row.streetNumber ? `, ${row.streetNumber}` : ''}`} arrow placement="bottom-start">
-                                <Typography
-                                  variant="body2"
-                                  noWrap
-                                  sx={{
-                                    color: '#1f2937',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    display: 'block',
-                                  }}
-                                >
-                                  {`${row.address}${row.streetNumber && row.streetNumber !== undefined ? `, ${row.streetNumber}` : ''}`}
-                                </Typography>
-                              </Tooltip>
+                        {columns.map((col) => {
+                          const value = getStoreField(row, col.key);
+                          return (
+                            <TableCell key={col.key} align={col.align} sx={{ px: 3, py: 1.5 }}>
+                              {col.key === 'actions' ? (
+                                <IconButton aria-label="Mostra dettagli" size="small" sx={{ width: 28, height: 28 }} onClick={() => handleOpenDrawer(row)}>
+                                  <ArrowForwardIosIcon sx={{ fontSize: 14, color: '#0B3EE3' }} />
+                                </IconButton>
+                              ) : (
+                                <Tooltip title={value} arrow placement="bottom-start">
+                                  <Typography variant="body2" noWrap
+                                    sx={{ color: col.key === 'website' && value ? '#0B3EE3' : '#1f2937', textDecoration: col.key === 'website' && value ? 'underline' : undefined, cursor: col.key === 'website' && value ? 'pointer' : undefined }}
+                                    onClick={col.key === 'website' && value ? () => window.open(value, '_blank', 'noopener,noreferrer') : undefined}>
+                                    {value || '-'}
+                                  </Typography>
+                                </Tooltip>
+                              )}
                             </TableCell>
-
-                            <TableCell align="left" sx={{ px: 3, py: 1.5 }}>
-                              <Tooltip title={row.city} arrow placement="bottom-start">
-                                <Typography
-                                  variant="body2"
-                                  noWrap
-                                  sx={{
-                                    color: '#1f2937',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    display: 'block',
-                                  }}
-                                >
-                                  {row.city}
-                                </Typography>
-                              </Tooltip>
-                            </TableCell>
-                          </>
-                        )}
-
-                        <TableCell align="right" sx={{ px: 3, py: 1.5 }}>
-                          <IconButton
-                            size="small"
-                            sx={{ width: 28, height: 28 }}
-                            onClick={() => handleOpenDrawer(row)}
-                          >
-                            <ArrowForwardIosIcon sx={{ fontSize: 14, color: '#0B3EE3' }} />
-                          </IconButton>
-                        </TableCell>
+                          );
+                        })}
                       </TableRow>
                     );
                   })}

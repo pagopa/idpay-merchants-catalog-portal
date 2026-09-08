@@ -1,3 +1,4 @@
+import { appConfig } from "../../config/app";
 import { Box, Typography } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import pariLogo from '../../assets/PARI.png';
@@ -29,7 +30,7 @@ export const BonusPariInfo = () => {
                     flexWrap: 'wrap',
                 }}
             >
-                Il Bonus Elettrodomestici è realizzato tramite{' '}
+                {appConfig.copy.realizationPrefix}{' '}
                 <Box
                     component="img"
                     src={pariLogo}

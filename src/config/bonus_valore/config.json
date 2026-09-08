@@ -1,0 +1,66 @@
+{
+  "initiativeName": "bonusvalore",
+  "datasetFile": "pos_export.json",
+  "tableColumns": {
+    "physical": [
+      {
+        "key": "franchiseName",
+        "label": "Esercente",
+        "width": "33%",
+        "sortable": true,
+        "align": "left"
+      },
+      {
+        "key": "address",
+        "label": "Indirizzo",
+        "width": "34%",
+        "sortable": true,
+        "align": "left"
+      },
+      {
+        "key": "city",
+        "label": "Città",
+        "width": "26%",
+        "sortable": true,
+        "align": "left"
+      },
+      {
+        "key": "actions",
+        "label": "",
+        "width": "7%",
+        "sortable": false,
+        "align": "right"
+      }
+    ],
+    "online": [
+      {
+        "key": "franchiseName",
+        "label": "Esercente",
+        "width": "40%",
+        "sortable": true,
+        "align": "left"
+      },
+      {
+        "key": "website",
+        "label": "URL",
+        "width": "53%",
+        "sortable": true,
+        "align": "left"
+      },
+      {
+        "key": "actions",
+        "label": "",
+        "width": "7%",
+        "sortable": false,
+        "align": "right"
+      }
+    ]
+  },
+  "copy": {
+    "searchPage": {
+      "title": "Cerca un negozio",
+      "description": "Puoi usare il tuo Bonus Valore nei negozi fisici e online\nche aderiscono all’iniziativa.\nLa lista è in aggiornamento."
+    },
+    "realizationPrefix": "Il Bonus Valore è realizzato tramite"
+  }
+}
