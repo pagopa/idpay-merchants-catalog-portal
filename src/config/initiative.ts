@@ -12,7 +12,7 @@ export type TableColumn = {
 };
 export type InitiativeConfig = {
   initiativeName: string;
-  datasetFile: string;
+  initiativeId: string;
   tableColumns: { physical: TableColumn[]; online: TableColumn[] };
   copy: {
     searchPage: { title: string; description: string };
@@ -29,15 +29,19 @@ export const getAppConfig = (initiative: string | undefined, isDevServer: boolea
     throw new Error(`VITE_INITIATIVE must be one of: ${Object.keys(initiatives).join(', ')}. Received: "${id}"`);
   }
 
+  const selected = initiatives[id];
+  const datasetFile = `pos_export_${selected.initiativeId}.json`;
+
   const basePath = `/${id}/lista-punti-vendita/`;
+  const storesBasePath = isDevServer ? basePath : `/${id}/puntivendita/`;
   const usersPortalPath = `/${id}/utente`;
   const usersPortalOrigin = isDevServer ? 'https://dev.pari.pagopa.it' : '';
 
   return {
-    ...initiatives[id],
+    ...selected,
     initiative: id,
     basePath,
-    storesUrl: `${basePath}data/${initiatives[id].datasetFile}`,
+    storesUrl: `${storesBasePath}data/${datasetFile}`,
     usersPortalLinks: {
       privacy: `${usersPortalOrigin}${usersPortalPath}/privacy-policy`,
       terms: `${usersPortalOrigin}${usersPortalPath}/terms-of-service`,
