@@ -1,0 +1,11 @@
+#footerBox .MuiGrid-root.MuiGrid-container{
+   justify-content: space-around;
+}
+
+@media screen and (width >= 350px ) and (width <= 500px) {
+  #footerBox .MuiGrid-root.MuiGrid-container {
+    display: flex;
+   flex-direction: column;
+   align-items: center;
+  }
+}
