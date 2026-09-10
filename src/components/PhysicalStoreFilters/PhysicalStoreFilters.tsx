@@ -218,6 +218,119 @@ const PhysicalStoreFilters: React.FC<PhysicalStoreFiltersProps> = ({
 
     const normalizeString = (str: string): string => str.toLowerCase().replace(/\s+/g, '');
 
+    const renderOptions = (options: string[], layout: 'block' | 'flex') => (
+        options.map((option, index) => (
+            <MenuItem
+                key={option + index}
+                value={option}
+                sx={{
+                    display: layout,
+                    ...(layout === 'flex' && { alignItems: 'center' }),
+                    maxWidth: '100%',
+                    minWidth: 0,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                }}
+            >
+                <Box
+                    component="span"
+                    sx={{
+                        display: 'block',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                    }}
+                >
+                    {option}
+                </Box>
+            </MenuItem>
+        ))
+    );
+
+    const franchiseAutocomplete = (
+        <Autocomplete
+            freeSolo
+            options={franchiseNames}
+            filterOptions={(options, { inputValue }) => {
+                if (inputValue.length < 3) {
+                    return [];
+                }
+
+                const normalizedInput = normalizeString(inputValue);
+                return options.filter(option =>
+                    normalizeString(option).includes(normalizedInput)
+                );
+            }}
+            inputValue={selectedFranchise || ''}
+            onInputChange={(_, value) => {
+                setSelectedFranchise(value)
+                onFilter({
+                    franchiseName: value || null,
+                    region: selectedRegion || null,
+                    province: selectedProvince ? provinceNameToSigla[selectedProvince] : null,
+                    city: selectedCity || null,
+                })
+            }}
+            clearIcon={<ClearCircleBox />}
+            sx={{
+                '& .MuiInputBase-input': {
+                    paddingLeft: '24px !important',
+                    ...(!isMobile && {
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                    }),
+                },
+            }}
+            renderOption={(props, option) => {
+                const { key, ...otherProps } = props;
+                return (
+                    <Box key={key} component="li" {...otherProps} sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '100%',
+                    }}>
+                        {option}
+                    </Box>
+                );
+            }}
+            renderInput={(params) => (
+                <TextField
+                    {...params}
+                    label="Esercente"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    onFocus={() => setSearchFocused(true)}
+                    onBlur={() => setSearchFocused(false)}
+                    sx={searchInputSx}
+                    InputLabelProps={{
+                        shrink: searchFocused || !!selectedFranchise,
+                    }}
+                    InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                            <InputAdornment
+                                position="start"
+                                sx={{ ml: 1, position: 'absolute', left: 0 }}
+                            >
+                                <SearchIcon
+                                    sx={{
+                                        color: searchFocused ? '#0B3EE3' : '#6B7280',
+                                        fontSize: 18,
+                                    }}
+                                />
+                            </InputAdornment>
+                        ),
+                        ...(!isMobile && { sx: { pl: 2 } }),
+                    }}
+                />
+            )}
+        />
+    );
+
     if (!isMobile) {
         return (
             <Box
@@ -242,84 +355,7 @@ const PhysicalStoreFilters: React.FC<PhysicalStoreFiltersProps> = ({
                         width: { xs: '100%', sm: '100%', md: 'auto' },
                     }}
                 >
-                    <Autocomplete
-                        freeSolo
-                        options={franchiseNames}
-                        filterOptions={(options, { inputValue }) => {
-                            if (inputValue.length < 3) {
-                                return [];
-                            }
-
-                            const normalizedInput = normalizeString(inputValue);
-                            return options.filter(option =>
-                                normalizeString(option).includes(normalizedInput)
-                            );
-                        }}
-                        inputValue={selectedFranchise || ''}
-                        onInputChange={(_, value) => {
-                            setSelectedFranchise(value)
-                            onFilter({
-                                franchiseName: value || null,
-                                region: selectedRegion || null,
-                                province: selectedProvince ? provinceNameToSigla[selectedProvince] : null,
-                                city: selectedCity || null,
-                            })
-                        }}
-                        clearIcon={<ClearCircleBox />}
-                        sx={{
-                            '& .MuiInputBase-input': {
-                                paddingLeft: '24px !important',
-                                textOverflow: 'ellipsis',
-                                overflow: 'hidden',
-                                whiteSpace: 'nowrap',
-                            },
-                        }}
-                        renderOption={(props, option) => {
-                            const { key, ...otherProps } = props;
-                            return (
-                                <Box key={key} component="li" {...otherProps} sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    maxWidth: '100%',
-                                }}>
-                                    {option}
-                                </Box>
-                            );
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Esercente"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                onFocus={() => setSearchFocused(true)}
-                                onBlur={() => setSearchFocused(false)}
-                                sx={searchInputSx}
-                                InputLabelProps={{
-                                    shrink: searchFocused || !!selectedFranchise,
-                                }}
-                                InputProps={{
-                                    ...params.InputProps,
-                                    startAdornment: (
-                                        <InputAdornment
-                                            position="start"
-                                            sx={{ ml: 1, position: 'absolute', left: 0 }}
-                                        >
-                                            <SearchIcon
-                                                sx={{
-                                                    color: searchFocused ? '#0B3EE3' : '#6B7280',
-                                                    fontSize: 18,
-                                                }}
-                                            />
-                                        </InputAdornment>
-                                    ),
-                                    sx: { pl: 2 },
-                                }}
-                            />
-                        )}
-                    />
+                    {franchiseAutocomplete}
                 </Box>
 
                 <Box sx={{ flex: 1, minWidth: "15%", width: { xs: '100%', sm: '100%', md: 'auto' }, }}>
@@ -350,32 +386,7 @@ const PhysicalStoreFilters: React.FC<PhysicalStoreFiltersProps> = ({
                             ) : null,
                         }}
                     >
-                        {regions.map((r, i) => (
-                            <MenuItem
-                                key={r + i}
-                                value={r}
-                                sx={{
-                                    display: 'block',
-                                    maxWidth: '100%',
-                                    minWidth: 0,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                <Box
-                                    component="span"
-                                    sx={{
-                                        display: 'block',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
-                                    {r}
-                                </Box>
-                            </MenuItem>
-                        ))}
+                        {renderOptions(regions, 'block')}
                     </TextField>
                 </Box>
 
@@ -407,32 +418,7 @@ const PhysicalStoreFilters: React.FC<PhysicalStoreFiltersProps> = ({
                             ) : null,
                         }}
                     >
-                        {provinces.map((p, i) => (
-                            <MenuItem
-                                key={p + i}
-                                value={p}
-                                sx={{
-                                    display: 'block',
-                                    maxWidth: '100%',
-                                    minWidth: 0,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                <Box
-                                    component="span"
-                                    sx={{
-                                        display: 'block',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
-                                    {p}
-                                </Box>
-                            </MenuItem>
-                        ))}
+                        {renderOptions(provinces, 'block')}
                     </TextField>
                 </Box>
 
@@ -455,32 +441,7 @@ const PhysicalStoreFilters: React.FC<PhysicalStoreFiltersProps> = ({
                             ) : null,
                         }}
                     >
-                        {cities.map((c, i) => (
-                            <MenuItem
-                                key={c + i}
-                                value={c}
-                                sx={{
-                                    display: 'block',
-                                    maxWidth: '100%',
-                                    minWidth: 0,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                <Box
-                                    component="span"
-                                    sx={{
-                                        display: 'block',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
-                                    {c}
-                                </Box>
-                            </MenuItem>
-                        ))}
+                        {renderOptions(cities, 'block')}
                     </TextField>
                 </Box>
 
@@ -591,76 +552,7 @@ const PhysicalStoreFilters: React.FC<PhysicalStoreFiltersProps> = ({
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
-                    <Autocomplete
-                        freeSolo
-                        options={franchiseNames}
-                        filterOptions={(options, { inputValue }) => {
-                            if (inputValue.length < 3) {
-                                return [];
-                            }
-
-                            const normalizedInput = normalizeString(inputValue);
-                            return options.filter(option =>
-                                normalizeString(option).includes(normalizedInput)
-                            );
-                        }}
-                        inputValue={selectedFranchise || ''}
-                        onInputChange={(_, value) => {
-                            setSelectedFranchise(value)
-                            onFilter({
-                                franchiseName: value || null,
-                                region: selectedRegion || null,
-                                province: selectedProvince ? provinceNameToSigla[selectedProvince] : null,
-                                city: selectedCity || null,
-                            })
-                        }}
-                        clearIcon={<ClearCircleBox />}
-                        sx={{
-                            '& .MuiInputBase-input': {
-                                paddingLeft: '24px !important',
-                            },
-                        }}
-                        renderOption={(props, option) => {
-                            const { key, ...otherProps } = props;
-                            return (
-                                <Box key={key} component="li" {...otherProps} sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    maxWidth: '100%',
-                                }}>
-                                    {option}
-                                </Box>
-                            );
-                        }}
-                        renderInput={(params) => (
-
-                            <TextField
-                                {...params}
-                                label="Esercente"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                onFocus={() => setSearchFocused(true)}
-                                onBlur={() => setSearchFocused(false)}
-                                sx={searchInputSx}
-                                InputLabelProps={{ shrink: searchFocused || !!selectedFranchise }}
-                                InputProps={{
-                                    ...params.InputProps,
-                                    startAdornment: (
-                                        <InputAdornment position="start" sx={{ ml: 1, position: 'absolute', left: 0 }}>
-                                            <SearchIcon
-                                                sx={{
-                                                    color: searchFocused ? '#0B3EE3' : '#6B7280',
-                                                    fontSize: 18,
-                                                }}
-                                            />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        )}
-                    />
+                    {franchiseAutocomplete}
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <TextField
@@ -684,33 +576,7 @@ const PhysicalStoreFilters: React.FC<PhysicalStoreFiltersProps> = ({
                             },
                         }}
                     >
-                        {regions.map((r, i) => (
-                            <MenuItem
-                                key={r + i}
-                                value={r}
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    maxWidth: '100%',
-                                    minWidth: 0,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                <Box
-                                    component="span"
-                                    sx={{
-                                        display: 'block',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
-                                    {r}
-                                </Box>
-                            </MenuItem>
-                        ))}
+                        {renderOptions(regions, 'flex')}
                     </TextField>
 
                     <TextField
@@ -727,33 +593,7 @@ const PhysicalStoreFilters: React.FC<PhysicalStoreFiltersProps> = ({
                         sx={dropdownInputSx}
                         disabled={!selectedRegion}
                     >
-                        {provinces.map((p, i) => (
-                            <MenuItem
-                                key={p + i}
-                                value={p}
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    maxWidth: '100%',
-                                    minWidth: 0,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                <Box
-                                    component="span"
-                                    sx={{
-                                        display: 'block',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
-                                    {p}
-                                </Box>
-                            </MenuItem>
-                        ))}
+                        {renderOptions(provinces, 'flex')}
                     </TextField>
 
                     <TextField
@@ -767,33 +607,7 @@ const PhysicalStoreFilters: React.FC<PhysicalStoreFiltersProps> = ({
                         sx={dropdownInputSx}
                         disabled={!selectedProvince}
                     >
-                        {cities.map((c, i) => (
-                            <MenuItem
-                                key={c + i}
-                                value={c}
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    maxWidth: '100%',
-                                    minWidth: 0,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                <Box
-                                    component="span"
-                                    sx={{
-                                        display: 'block',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
-                                    {c}
-                                </Box>
-                            </MenuItem>
-                        ))}
+                        {renderOptions(cities, 'flex')}
                     </TextField>
 
                     <Button
