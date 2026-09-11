@@ -6,7 +6,7 @@ describe('getAppConfig', () => {
       const dev = getAppConfig(initiative, true);
       const prod = getAppConfig(initiative, false);
       expect(prod.basePath).toBe(`/${initiative}/lista-punti-vendita/`);
-      expect(prod.storesUrl).toBe(`/${initiative}/puntivendita/data/pos_export_${prod.initiativeId}.json`);
+      expect(prod.storesUrl).toBe(`/${initiative}/lista-punti-vendita/data/pos_export_${prod.initiativeId}.json`);
       expect(dev.storesUrl).toBe(`${dev.basePath}data/pos_export_${dev.initiativeId}.json`);
       expect(prod.usersPortalLinks.privacy).toBe(`/${initiative}/utente/privacy-policy`);
       expect(dev.usersPortalLinks.terms).toBe(`https://dev.pari.pagopa.it/${initiative}/utente/terms-of-service`);
