@@ -33,7 +33,6 @@ export const getAppConfig = (initiative: string | undefined, isDevServer: boolea
   const datasetFile = `pos_export_${selected.initiativeId}.json`;
 
   const basePath = `/${id}/lista-punti-vendita/`;
-  const storesBasePath = isDevServer ? basePath : `/${id}/puntivendita/`;
   const usersPortalPath = `/${id}/utente`;
   const usersPortalOrigin = isDevServer ? 'https://dev.pari.pagopa.it' : '';
 
@@ -41,7 +40,7 @@ export const getAppConfig = (initiative: string | undefined, isDevServer: boolea
     ...selected,
     initiative: id,
     basePath,
-    storesUrl: `${storesBasePath}data/${datasetFile}`,
+    storesUrl: `${basePath}data/${datasetFile}`,
     usersPortalLinks: {
       privacy: `${usersPortalOrigin}${usersPortalPath}/privacy-policy`,
       terms: `${usersPortalOrigin}${usersPortalPath}/terms-of-service`,
