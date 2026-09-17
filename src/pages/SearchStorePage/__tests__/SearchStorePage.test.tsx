@@ -18,7 +18,7 @@ describe('SearchStorePage', () => {
     expect(screen.queryByText('Loaded stores')).not.toBeInTheDocument();
     resolveFetch({ ok: true, json: async () => [physicalStore] } as Response);
     await screen.findByText('Loaded stores');
-    expect(fetch).toHaveBeenCalledWith(appConfig.storesUrl);
+    expect(fetch).toHaveBeenCalledWith(appConfig.storesUrl, { cache: 'no-store' });
     expect(jest.mocked(StoreList).mock.calls.at(-1)?.[0].data).toEqual([physicalStore]);
   });
 
