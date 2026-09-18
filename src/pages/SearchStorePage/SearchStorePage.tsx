@@ -11,7 +11,7 @@ const SearchStorePage = () => {
 
   useEffect(() => {
     const doFetch = async () => {
-      await fetch(appConfig.storesUrl)
+      await fetch(appConfig.storesUrl, { cache: "no-store" })
         .then((res) => {
           if (!res.ok) throw new Error("Errore nel caricamento del file JSON");
           return res.json();
