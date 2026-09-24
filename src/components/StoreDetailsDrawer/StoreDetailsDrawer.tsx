@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {
-  Box, Typography, IconButton, Drawer, SwipeableDrawer, Button, Link,
+  Box, Typography, IconButton, Drawer, SwipeableDrawer, Button, Link, Tooltip,
   Divider,
   Alert,
 } from '@mui/material'
@@ -22,6 +22,92 @@ type Props = {
   mobileHeight?: number | string
   forceMode?: 'drawer' | 'swipeable'
 }
+
+const truncatedTextSx = {
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  display: 'block',
+  minWidth: 0,
+}
+
+const multilineTruncatedTextSx = {
+  overflow: 'hidden',
+  display: '-webkit-box',
+  WebkitBoxOrient: 'vertical',
+  WebkitLineClamp: 2,
+  whiteSpace: 'normal',
+  minWidth: 0,
+}
+
+const TruncatedTooltipText = ({
+  text,
+  variant,
+  fontWeight,
+  color,
+  mt,
+  fontStyle,
+  multiline = false,
+}: {
+  text?: string
+  variant: React.ComponentProps<typeof Typography>['variant']
+  fontWeight?: React.ComponentProps<typeof Typography>['fontWeight']
+  color?: React.ComponentProps<typeof Typography>['color']
+  mt?: React.ComponentProps<typeof Typography>['mt']
+  fontStyle?: React.ComponentProps<typeof Typography>['fontStyle']
+  multiline?: boolean
+}) => {
+  const displayText = text?.trim() || '-'
+
+  return (
+    <Tooltip
+      title={displayText === '-' ? '' : displayText}
+      placement="bottom-start"
+      disableHoverListener={displayText === '-'}
+    >
+      <Typography
+        variant={variant}
+        fontWeight={fontWeight}
+        color={color}
+        mt={mt}
+        fontStyle={fontStyle}
+        noWrap={!multiline}
+        sx={multiline ? multilineTruncatedTextSx : truncatedTextSx}
+      >
+        {displayText}
+      </Typography>
+    </Tooltip>
+  )
+}
+
+const TruncatedTooltipLink = ({
+  text,
+  href,
+  target,
+  rel,
+}: {
+  text: string
+  href: string
+  target?: string
+  rel?: string
+}) => (
+  <Tooltip title={text} placement="bottom-start">
+    <Link
+      href={href}
+      target={target}
+      rel={rel}
+      underline="hover"
+      sx={{
+        ...truncatedTextSx,
+        color: '#0B3EE3',
+        fontWeight: 700,
+        fontSize: '16px',
+      }}
+    >
+      {text}
+    </Link>
+  </Tooltip>
+)
 
 export const StoreDetailsDrawer: React.FC<Props> = ({
   open, onClose, onOpen, store, width = 420, mobileHeight = '85%', forceMode,
@@ -107,6 +193,11 @@ export const StoreDetailsDrawer: React.FC<Props> = ({
 
   const hasContacts = !!(physicalStore?.channelPhone || store?.website)
 
+  const storeTitle = store?.franchiseName || '-'
+  const physicalStoreAddress = physicalStore
+    ? `${physicalStore.address}${physicalStore.streetNumber ? `, ${physicalStore.streetNumber}` : ''}, ${physicalStore.zipCode} ${physicalStore.city} ${physicalStore.province}`
+    : undefined
+
   const Header = (
     <Box position="relative" mb={2} p={2}>
       <IconButton
@@ -121,14 +212,14 @@ export const StoreDetailsDrawer: React.FC<Props> = ({
         <CloseIcon />
       </IconButton>
 
-      <Typography
+      <TruncatedTooltipText
         variant="h6"
         fontWeight={700}
         fontStyle="bold"
         mt={4}
-      >
-        {store?.franchiseName || '-'}
-      </Typography>
+        text={storeTitle}
+        multiline
+      />
 
       {physicalStore && (
         <Box mt={3}>
@@ -138,16 +229,15 @@ export const StoreDetailsDrawer: React.FC<Props> = ({
           <Box mt={2} display="flex" alignItems="center" gap={1}>
             <Box display="flex" alignItems="center" sx={{ flex: 1, minWidth: 0 }}>
               <PlaceIcon sx={{ fontSize: 20, mr: 0.5, flexShrink: 0 }} />
-              <Typography
+              <TruncatedTooltipText
                 variant='body2'
                 fontWeight={700}
-                sx={{ wordBreak: 'break-word' }}
-              >
-                {`${physicalStore.address}${physicalStore.streetNumber ? `, ${physicalStore.streetNumber}` : ''}, ${physicalStore.zipCode} ${physicalStore.city} ${physicalStore.province}`}
-              </Typography>
+                text={physicalStoreAddress}
+              />
             </Box>
             <CopyToClipboardButton
-              value={`${physicalStore.address}${physicalStore.streetNumber ? `, ${physicalStore.streetNumber}` : ''}, ${physicalStore.zipCode} ${physicalStore.city} ${physicalStore.province}`}
+              value={physicalStoreAddress ?? ''}
+              sx={{ flexShrink: 0 }}
             />
           </Box>
         </Box>
@@ -165,39 +255,25 @@ export const StoreDetailsDrawer: React.FC<Props> = ({
             </Typography>
 
             {physicalStore?.channelPhone && (
-              <Box display="flex" alignItems="center" gap={1}>
-                <PhoneIcon sx={{ fontSize: 20, color: '#0B3EE3' }} />
-                <Link
+              <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 0 }}>
+                <PhoneIcon sx={{ fontSize: 20, color: '#0B3EE3', flexShrink: 0 }} />
+                <TruncatedTooltipLink
                   href={`tel:${physicalStore.channelPhone}`}
-                  underline="hover"
-                  sx={{
-                    color: '#0B3EE3',
-                    fontWeight: 700,
-                    fontSize: '16px'
-                  }}
-                >
-                  {physicalStore.channelPhone}
-                </Link>
+                  text={physicalStore.channelPhone}
+                />
               </Box>
             )}
             {physicalStore?.channelPhone && <Divider sx={{ my: 1 }} />}
 
             {store.website && (
-              <Box display="flex" alignItems="center" gap={1}>
-                <LanguageIcon sx={{ fontSize: 20, color: '#0B3EE3' }} />
-                <Link
+              <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 0 }}>
+                <LanguageIcon sx={{ fontSize: 20, color: '#0B3EE3', flexShrink: 0 }} />
+                <TruncatedTooltipLink
                   href={store.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  underline="hover"
-                  sx={{
-                    color: '#0B3EE3',
-                    fontWeight: 700,
-                    fontSize: '16px'
-                  }}
-                >
-                  {store.website}
-                </Link>
+                  text={store.website}
+                />
               </Box>
             )}
           </>
