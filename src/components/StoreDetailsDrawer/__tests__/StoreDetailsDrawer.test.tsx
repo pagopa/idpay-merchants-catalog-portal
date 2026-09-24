@@ -46,6 +46,33 @@ describe('StoreDetailsDrawer', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
+  it('truncates long drawer texts and exposes their full value in tooltips', () => {
+    const longStore = {
+      ...physicalStore,
+      franchiseName: 'NOMELUNGHISSIMOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO',
+      address: 'Via dal nome estremamente lungo che deve restare su una sola riga nel drawer',
+      channelPhone: '02123456789012345678901234567890',
+      website: 'https://www.example.com/percorso/molto/lungo/che/deve/essere/troncato',
+    };
+    const address = `${longStore.address}, ${longStore.streetNumber}, ${longStore.zipCode} ${longStore.city} ${longStore.province}`;
+
+    render(<StoreDetailsDrawer open onClose={jest.fn()} store={longStore} />);
+
+    const title = screen.getByText(longStore.franchiseName);
+    const addressText = screen.getByText(address);
+    const phoneLink = screen.getByRole('link', { name: longStore.channelPhone });
+    const websiteLink = screen.getByRole('link', { name: longStore.website });
+
+    expect(title).toHaveAttribute('aria-label', longStore.franchiseName);
+    expect(title).not.toHaveClass('MuiTypography-noWrap');
+
+    expect(addressText).toHaveAttribute('aria-label', address);
+    expect(addressText).toHaveClass('MuiTypography-noWrap');
+
+    expect(phoneLink).toHaveAttribute('aria-label', longStore.channelPhone);
+    expect(websiteLink).toHaveAttribute('aria-label', longStore.website);
+  });
+
   it.each(['Desktop', 'Android'])('opens directions on %s', (userAgent) => {
     jest.spyOn(navigator, 'userAgent', 'get').mockReturnValue(userAgent);
     render(<StoreDetailsDrawer open onClose={jest.fn()} store={physicalStore} />);
