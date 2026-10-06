@@ -1,0 +1,21 @@
+[
+  {
+    "id": "elettrodomestici-physical-demo",
+    "type": "PHYSICAL",
+    "franchiseName": "DEMO Bonus Elettrodomestici - Negozio Torino",
+    "address": "Via Demo Elettrodomestici",
+    "streetNumber": "30",
+    "city": "Torino",
+    "region": "Piemonte",
+    "province": "TO",
+    "zipCode": "10121",
+    "channelPhone": "",
+    "website": "https://elettrodomestici.com/elettrodomestici/negozio"
+  },
+  {
+    "id": "elettrodomestici-online-demo",
+    "type": "ONLINE",
+    "franchiseName": "DEMO Bonus Elettrodomestici - Shop Online",
+    "website": "https://elettrodomestici.com/elettrodomestici/online"
+  }
+]

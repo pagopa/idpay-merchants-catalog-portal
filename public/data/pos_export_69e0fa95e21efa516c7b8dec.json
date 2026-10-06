@@ -1,0 +1,21 @@
+[
+  {
+    "id": "decoder-physical-demo",
+    "type": "PHYSICAL",
+    "franchiseName": "DEMO Bonus Decoder - Negozio Milano",
+    "address": "Via Demo Decoder",
+    "streetNumber": "10",
+    "city": "Milano",
+    "region": "Lombardia",
+    "province": "MI",
+    "zipCode": "20121",
+    "channelPhone": "",
+    "website": "https://decoder.com/decoder/negozio"
+  },
+  {
+    "id": "decoder-online-demo",
+    "type": "ONLINE",
+    "franchiseName": "DEMO Bonus Decoder - Shop Online",
+    "website": "https://decoder.com/decoder/online"
+  }
+]
