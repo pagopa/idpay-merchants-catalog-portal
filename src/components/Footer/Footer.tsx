@@ -68,7 +68,7 @@ export const Footer = () => {
             <FooterLegal
                 content={
                     <span style={{ whiteSpace: 'pre-line' }}>
-                        <b>PagoPA S.p.A.</b> - Società per azioni con socio unico - Capitale sociale di euro 1,000,000 interamente versato - Sede legale in Roma, Piazza Colonna 370, CAP 00187 - N. di iscrizione a Registro Imprese di Roma, CF e P.IVA 15376371009
+                        <b>PagoPA S.p.A.</b> - Società per azioni - Capitale sociale di euro 1,000,000 interamente versato - Sede legale in Roma, Piazza Colonna 370, CAP 00187 - N. di iscrizione a Registro Imprese di Roma, CF e P.IVA 15376371009
                     </span>
                 }
             />
